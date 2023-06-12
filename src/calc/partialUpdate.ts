@@ -14,6 +14,7 @@ export const RecalculateSubsequentRows = (
     [columnId]: value,
   } as YearRow;
 
+  // this call needs to return the row passed in, have a separate function for calculating the first row, at the moment the row edited disappears
   const recalculatedRows = calculateFullData([changedRow], options);
 
   const unchangedRows = oldRows.slice(0, changedRowIndex);

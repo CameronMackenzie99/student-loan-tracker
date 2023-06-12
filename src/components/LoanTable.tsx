@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-table";
 import type { FormType } from "./LoanForm";
 import { columns } from "./columns";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { CalcOptions } from "../calc/projection";
 import { calculateFullData } from "../calc/projection";
 import { defaultRowOptions } from "../calc/defaultRowOptions";
@@ -63,10 +63,14 @@ export const LoanTable = (formInput: FormType) => {
 const LoanTableGrid = (props: { rows: YearRow[] }) => {
   const [clientData, setClientData] = useState([...props.rows]);
 
+  useEffect(() => {
+    setClientData([...props.rows]);
+  }, [props.rows]);
+
   console.log("clientData", clientData);
 
   const table = useReactTable({
-    data: props.rows,
+    data: clientData,
     columns,
     getCoreRowModel: getCoreRowModel<YearRow>(),
     meta: {
