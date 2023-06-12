@@ -7,7 +7,8 @@
     "dev": "next dev",
     "postinstall": "prisma generate",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "test": "vitest"
   },
   "dependencies": {
     "@hookform/resolvers": "^2.9.11",
@@ -19,7 +20,7 @@
     "@trpc/next": "^10.18.0",
     "@trpc/react-query": "^10.18.0",
     "@trpc/server": "^10.18.0",
-    "next": "13.1.2",
+    "next": "13.4.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "7.43.5",
@@ -35,13 +36,15 @@
     "@typescript-eslint/parser": "^5.57.0",
     "autoprefixer": "^10.4.14",
     "eslint": "^8.37.0",
-    "eslint-config-next": "13.1.2",
+    "eslint-config-next": "13.4.3",
     "postcss": "^8.4.21",
     "prettier": "^2.8.7",
     "prettier-plugin-tailwindcss": "^0.2.6",
     "prisma": "^4.12.0",
     "tailwindcss": "^3.3.0",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "vite": "^4.3.9",
+    "vitest": "^0.32.0"
   },
   "ct3aMetadata": {
     "initVersion": "7.3.2"

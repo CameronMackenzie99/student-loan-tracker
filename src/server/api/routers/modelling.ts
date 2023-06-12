@@ -1,29 +1,16 @@
-import type { FormType } from "../../../pages";
-import { FormSchema } from "../../../pages";
+import { FormSchema } from "../../../components/LoanForm";
+import type { FormType } from "../../../components/LoanForm";
+import type { YearRow } from "../../../components/LoanTable";
 
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
-export type YearRow = {
-  currentLoanYear: number;
-  graduatingYear: number;
-  adjustedSalary: number;
-  calendarYear: number;
-  totalDebt: number;
-  interestRate: number;
-  annualInterest: number;
-  repaymentThreshold: number;
-  annualRepayment: number;
-  totalRepaid: number;
-  yearsUntilWiped: number;
-};
-
 type CalcYearData = (row: YearRow, result: YearRow[]) => CalcYearData | null;
 
-const YEARS_UNTIL_WIPED = 30;
-const AVERAGE_SALARY_GROWTH = 1.03;
+const LOAN_LENGTH = 30;
+const AVERAGE_SALARY_GROWTH = 1.05;
 const REPAYMENT_THRESHOLD_GROWTH = 1.03;
 const INCOME_PERCENTAGE_OVER_THRESHOLD = 0.09;
-const INTEREST_RATE = 6.9;
+const INTEREST_RATE = 3;
 const REPAYMENT_THRESHOLD = 27295;
 const STARTING_SALARY = 30000;
 
@@ -41,11 +28,11 @@ function calculateYearData(
     prevYearRow.totalDebt * (prevYearRow.interestRate / 100);
 
   let annualRepayment: number;
-  if (prevYearRow.adjustedSalary < prevYearRow.repaymentThreshold) {
+  if (prevYearRow.salary < prevYearRow.repaymentThreshold) {
     annualRepayment = 0;
   } else {
     const maxRepayment =
-      (prevYearRow.adjustedSalary - prevYearRow.repaymentThreshold) *
+      (prevYearRow.salary - prevYearRow.repaymentThreshold) *
       INCOME_PERCENTAGE_OVER_THRESHOLD;
 
     annualRepayment =
@@ -60,7 +47,7 @@ function calculateYearData(
         ? 0
         : calendarYear - prevYearRow.graduatingYear,
     graduatingYear: prevYearRow.graduatingYear,
-    adjustedSalary: prevYearRow.adjustedSalary * AVERAGE_SALARY_GROWTH,
+    salary: prevYearRow.salary * AVERAGE_SALARY_GROWTH,
     calendarYear: calendarYear,
     totalDebt: Math.max(
       prevYearRow.totalDebt +
@@ -84,7 +71,7 @@ function calculateYearData(
 function calculateFullData(input: FormType) {
   const currentYear = new Date().getFullYear();
   const yearsUntilWiped =
-    YEARS_UNTIL_WIPED -
+    LOAN_LENGTH -
     (currentYear - input.graduatingYear >= 0
       ? currentYear - input.graduatingYear
       : 0);
@@ -93,9 +80,9 @@ function calculateFullData(input: FormType) {
 
   calculateYearData(
     {
-      currentLoanYear: 30 - yearsUntilWiped,
+      currentLoanYear: LOAN_LENGTH - yearsUntilWiped,
       graduatingYear: input.graduatingYear,
-      adjustedSalary: STARTING_SALARY,
+      salary: STARTING_SALARY,
       calendarYear: currentYear,
       totalDebt: input.loanBalance,
       interestRate: INTEREST_RATE,
@@ -113,9 +100,5 @@ function calculateFullData(input: FormType) {
 export const modellingRouter = createTRPCRouter({
   modelLoanValue: publicProcedure.input(FormSchema).query(({ input }) => {
     return calculateFullData(input);
-  }),
-
-  getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.example.findMany();
   }),
 });
