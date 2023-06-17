@@ -1,4 +1,4 @@
-name: pnpm Example Workflow
+name: Vitest unit tests
 on:
   push:
 jobs:
@@ -20,5 +20,5 @@ jobs:
     - name: Install dependencies
       run: |
         pnpm install    
-        pnpm run build --if-present
+        pnpm run build
         pnpm test
