@@ -1,7 +1,7 @@
 import { assert, expect, test } from "vitest";
 import { defaultRowOptions } from "./defaultRowOptions";
 import type { CalcOptions } from "./projection";
-import { calculateFullData, calculateYearData } from "./projection";
+import { calculateFullData, calculateYearRow } from "./projection";
 
 const options: CalcOptions = {
   graduatingYear: 2021,
@@ -26,7 +26,7 @@ test("Calculate year data when first calculated row", () => {
     totalRepaid: 0,
     yearsUntilWiped: 28,
   };
-  const result = calculateYearData(startingRow, options.rowOptions);
+  const result = calculateYearRow(startingRow, options.rowOptions);
 
   const expectedRow = {
     currentLoanYear: 2,
@@ -60,7 +60,7 @@ test("Calculate year data when not first calculated row", () => {
     yearsUntilWiped: 27,
   };
 
-  const result = calculateYearData(firstRow, options.rowOptions);
+  const result = calculateYearRow(firstRow, options.rowOptions);
 
   const expected = {
     annualInterest: 147.1965,
