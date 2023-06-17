@@ -64,21 +64,15 @@ export const recalculateEditedRow = (
   rowInputs: RowInputs,
   options: CalcOptions
 ) => {
-  const totalDebt = calculateTotalDebt(
-    rowInputs.totalDebt,
-    rowInputs.interestRate,
-    rowInputs.annualRepayment
-  );
-
   const annualInterest = calculateAnnualInterest(
-    totalDebt,
+    editedRow.totalDebt,
     editedRow.interestRate
   );
 
   const annualRepayment = calculateAnnualRepayment(
     editedRow.salary,
     editedRow.repaymentThreshold,
-    totalDebt,
+    editedRow.totalDebt,
     annualInterest,
     options.rowOptions
   );
@@ -90,7 +84,7 @@ export const recalculateEditedRow = (
     graduatingYear: editedRow.graduatingYear,
     salary: editedRow.salary,
     calendarYear: editedRow.calendarYear,
-    totalDebt: totalDebt,
+    totalDebt: editedRow.totalDebt,
     interestRate: editedRow.interestRate,
     annualInterest: annualInterest,
     repaymentThreshold: editedRow.repaymentThreshold,

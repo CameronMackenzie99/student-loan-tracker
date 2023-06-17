@@ -43,7 +43,7 @@ export const LoanTable = (formInput: FormType) => {
   const options = {
     graduatingYear: formInput.graduatingYear,
     loanBalance: formInput.loanBalance,
-    loanPeriod: 30,
+    loanPeriod: 40,
     repaymentThreshold: 27295,
     salary: 30000,
     rowOptions: defaultRowOptions,
@@ -101,7 +101,7 @@ const LoanTableGrid = (props: { rows: YearRow[] }) => {
         id="result"
       >
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+          <thead className="mb-20 px-6 py-6 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
