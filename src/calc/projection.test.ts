@@ -1,7 +1,11 @@
 import { assert, expect, test } from "vitest";
 import { defaultRowOptions } from "./defaultRowOptions";
 import type { CalcOptions } from "./projection";
-import { calculateFullData, calculateYearRow } from "./projection";
+import {
+  calculateFullData,
+  calculateYearRow,
+  calculateInitialYearRow,
+} from "./projection";
 
 const options: CalcOptions = {
   graduatingYear: 2021,
@@ -12,21 +16,23 @@ const options: CalcOptions = {
   rowOptions: defaultRowOptions,
 };
 
+const options2: CalcOptions = {
+  graduatingYear: 2021,
+  loanBalance: 50000,
+  loanPeriod: 30,
+  repaymentThreshold: 27295,
+  salary: 30000,
+  rowOptions: defaultRowOptions,
+};
+
 test("Calculate year data when first calculated row", () => {
-  const startingRow = {
-    currentLoanYear: options.loanPeriod - 28 - 1,
-    graduatingYear: options.graduatingYear,
-    salary: options.salary,
-    calendarYear: 2023 - 1,
+  const startingRowInputs = {
     totalDebt: options.loanBalance,
     interestRate: options.rowOptions.interestRate,
-    annualInterest: 0,
-    repaymentThreshold: options.repaymentThreshold,
     annualRepayment: 0,
     totalRepaid: 0,
-    yearsUntilWiped: 28,
   };
-  const result = calculateYearRow(startingRow, options.rowOptions);
+  const result = calculateInitialYearRow(startingRowInputs, options);
 
   const expectedRow = {
     currentLoanYear: 2,
@@ -39,7 +45,7 @@ test("Calculate year data when first calculated row", () => {
     repaymentThreshold: 27295,
     annualRepayment: 243.45,
     totalRepaid: 243.45,
-    yearsUntilWiped: 27,
+    yearsUntilWiped: 29,
   };
 
   assert.deepEqual(result, expectedRow);
@@ -79,15 +85,26 @@ test("Calculate year data when not first calculated row", () => {
   assert.deepEqual(result, expected);
 });
 
-test("Calculate full total debt data", () => {
-  const rowArray = calculateFullData([], options);
+const expected1 = [
+  5000, 4907, 4774, 4597, 4373, 4096, 3761, 3364, 2899, 2359, 1737, 1028, 222,
+  7,
+];
+
+const expected2 = [
+  50000, 51257, 52514, 53770, 55021, 56263, 57494, 58709, 59903, 61073, 62213,
+  63318, 64381, 65397, 66358, 67257, 68086, 68836, 69497, 70061, 70515, 70850,
+  71051, 71106, 71001, 70720, 70247, 69565, 68655,
+];
+
+test.each([
+  [options, expected1],
+  [options2, expected2],
+])("Calculate full total debt data", (opts, expected) => {
+  const rowArray = calculateFullData([], opts);
 
   const totalDebtArray = rowArray.map((row) =>
     Math.round(row?.totalDebt ?? -1)
   );
 
-  expect(totalDebtArray).toEqual([
-    5000, 4907, 4774, 4597, 4373, 4096, 3761, 3364, 2899, 2359, 1737, 1028, 222,
-    7, 0,
-  ]);
+  expect(totalDebtArray).toEqual(expected);
 });

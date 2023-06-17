@@ -54,8 +54,6 @@ export const calculateFullData = (rows: YearRow[], options: CalcOptions) => {
   return resultRows;
 };
 
-type EditableFields = Pick<YearRow, "salary" | "interestRate">;
-
 export type RowInputs = Pick<
   YearRow,
   "totalDebt" | "interestRate" | "annualRepayment" | "totalRepaid"
@@ -102,7 +100,7 @@ export const recalculateEditedRow = (
   };
 };
 
-const calculateInitialYearRow = (
+export const calculateInitialYearRow = (
   //TODO: disco-union the row inputs depending on first row or edited
   rowInputs: RowInputs,
   options: CalcOptions
@@ -196,7 +194,7 @@ export const calculateYearRow = (prevRow: YearRow, rowOptions: RowOptions) => {
 function calculateYearsUntilWiped(loanPeriod: number, graduatingYear: number) {
   return (
     loanPeriod -
-    (CURRENT_YEAR - graduatingYear >= 0 ? CURRENT_YEAR - graduatingYear : 0)
+    (CURRENT_YEAR - graduatingYear >= 0 ? CURRENT_YEAR - graduatingYear - 1 : 0)
   );
 }
 

@@ -26,9 +26,14 @@ export const RecalculateSubsequentRows = (
       totalRepaid: 0,
     };
   } else {
-    const { totalDebt, interestRate, annualRepayment, totalRepaid } =
-      oldRows[changedRowIndex - 1];
-    rowInputs = { totalDebt, interestRate, annualRepayment, totalRepaid };
+    const prevRow = oldRows[changedRowIndex - 1];
+    // will always be defined, if else block to satify compiler without using !
+    if (prevRow !== undefined) {
+      const { totalDebt, interestRate, annualRepayment, totalRepaid } = prevRow;
+      rowInputs = { totalDebt, interestRate, annualRepayment, totalRepaid };
+    } else {
+      throw new Error("Previous row is undefined");
+    }
   }
   console.log("rowinputs", rowInputs);
 
