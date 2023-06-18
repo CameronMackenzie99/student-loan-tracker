@@ -20,7 +20,6 @@ export const EditableCell = ({
 
   const onBlur = () => {
     table.options.meta?.updateData(index, id, value, options);
-    console.log("meta value", value);
   };
 
   return (

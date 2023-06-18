@@ -51,8 +51,6 @@ export const LoanTable = (formInput: FormType) => {
 
   const tableData = calculateFullData([], options);
 
-  console.log("tableData", tableData);
-
   return (
     <OptionsContext.Provider value={options}>
       <LoanTableGrid rows={...tableData} />
@@ -66,8 +64,6 @@ const LoanTableGrid = (props: { rows: YearRow[] }) => {
   useEffect(() => {
     setClientData([...props.rows]);
   }, [props.rows]);
-
-  console.log("clientData", clientData);
 
   const table = useReactTable({
     data: clientData,
@@ -91,7 +87,6 @@ const LoanTableGrid = (props: { rows: YearRow[] }) => {
         );
       },
     },
-    debugTable: true,
   });
 
   return (

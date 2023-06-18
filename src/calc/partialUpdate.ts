@@ -9,13 +9,10 @@ export const RecalculateSubsequentRows = (
   value: number,
   options: CalcOptions
 ) => {
-  console.log("changedRowIndex", changedRowIndex);
   const changedRow = {
     ...oldRows[changedRowIndex],
     [columnId]: value,
   } as YearRow;
-
-  console.log("changedRow", changedRow);
 
   let rowInputs: RowInputs;
   if (changedRowIndex === 0) {
@@ -35,12 +32,9 @@ export const RecalculateSubsequentRows = (
       throw new Error("Previous row is undefined");
     }
   }
-  console.log("rowinputs", rowInputs);
-
   const recalculatedRow = recalculateEditedRow(changedRow, rowInputs, options);
   const recalculatedRows = calculateFullData([recalculatedRow], options);
   const unchangedRows = oldRows.slice(0, changedRowIndex);
-  console.log("newRows", recalculatedRows, unchangedRows);
 
   return unchangedRows.concat(recalculatedRows);
 };

@@ -26,8 +26,6 @@ export const calculateFullData = (rows: YearRow[], options: CalcOptions) => {
     options.loanPeriod,
     options.graduatingYear
   );
-  console.log("initialYearsTillWiped", yearsUntilWiped);
-
   if (startingRow === undefined) {
     startingRow = calculateInitialYearRow(
       {
@@ -40,7 +38,6 @@ export const calculateFullData = (rows: YearRow[], options: CalcOptions) => {
     );
   }
 
-  console.log("starting row", startingRow);
   const resultRows = [startingRow];
 
   while (resultRows.length <= yearsUntilWiped) {
