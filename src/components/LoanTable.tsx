@@ -96,7 +96,7 @@ const LoanTableGrid = (props: { rows: YearRow[] }) => {
         id="result"
       >
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="mb-20 px-6 py-6 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+          <thead className="sticky top-0 z-10 mb-20 bg-gray-50 px-6 py-6 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
