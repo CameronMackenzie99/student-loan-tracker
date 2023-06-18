@@ -36,7 +36,7 @@ export const LoanForm = ({ onFormDataChange }: FormSetter) => {
         <div>
           <label
             htmlFor="loanBalance"
-            className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+            className="mb-2 block text-sm font-medium text-white"
           >
             Current Loan Balance:
           </label>
@@ -56,7 +56,7 @@ export const LoanForm = ({ onFormDataChange }: FormSetter) => {
         <div>
           <label
             htmlFor="graduatingYear"
-            className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+            className="mb-2 block text-sm font-medium text-white"
           >
             Graduating Year:
           </label>
