@@ -30,7 +30,7 @@ export const LoanForm = ({ onFormDataChange }: FormSetter) => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mb-8 grid grid-cols-3 items-center"
+      className="mb-8 flex flex-col items-center gap-4 sm:grid sm:grid-cols-3"
     >
       <div className="flex flex-col items-center justify-center space-y-4 md:space-y-6">
         <div>
@@ -48,7 +48,7 @@ export const LoanForm = ({ onFormDataChange }: FormSetter) => {
             {...register("loanBalance")}
           />
           {errors.loanBalance && (
-            <span className="mt-2 block text-red-800">
+            <span className="mt-2 block text-sm text-amber-300">
               {errors.loanBalance?.message}
             </span>
           )}
@@ -68,18 +68,20 @@ export const LoanForm = ({ onFormDataChange }: FormSetter) => {
             {...register("graduatingYear")}
           />
           {errors.graduatingYear && (
-            <span className="mt-2 block text-red-800">
+            <span className="mt-2 block text-sm text-amber-300">
               {errors.graduatingYear?.message}
             </span>
           )}
         </div>
       </div>
       <div />
-      <input
-        type="submit"
-        className="focus-visible:ring-ring ring-offset-background inline-flex h-10 w-20 items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-        disabled={isSubmitting}
-      />
+      <div className="flex flex-col items-center justify-center">
+        <input
+          type="submit"
+          className="focus-visible:ring-ring ring-offset-background inline-flex h-10 w-20 items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          disabled={isSubmitting}
+        />
+      </div>
     </form>
   );
 };

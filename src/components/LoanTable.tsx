@@ -90,13 +90,13 @@ const LoanTableGrid = (props: { rows: YearRow[] }) => {
   });
 
   return (
-    <>
+    <div className="overflow-hidden rounded-xl">
       <div
-        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 sm:text-sm"
+        className="block max-h-screen max-w-full overflow-auto rounded-lg border border-gray-300 bg-gray-50 px-2 text-gray-900 sm:text-sm"
         id="result"
       >
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="sticky top-0 z-10 mb-20 bg-gray-50 px-6 py-6 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+        <table className="mt-2 min-w-full divide-y divide-gray-200 sm:min-w-full">
+          <thead className="sticky top-0 z-10 bg-gray-50 text-center align-bottom text-xs font-medium uppercase tracking-wider text-gray-500 sm:px-6">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -118,7 +118,7 @@ const LoanTableGrid = (props: { rows: YearRow[] }) => {
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
-                    className="whitespace-nowrap px-4 py-2 text-center"
+                    className="whitespace-nowrap pb-2 text-center text-sm sm:mx-6 md:mx-12"
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
@@ -144,6 +144,6 @@ const LoanTableGrid = (props: { rows: YearRow[] }) => {
           </tfoot>
         </table>
       </div>
-    </>
+    </div>
   );
 };
