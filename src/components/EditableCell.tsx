@@ -23,17 +23,19 @@ export const EditableCell = ({
   };
 
   return (
-    <div className="relative flex rounded-md py-2 shadow-sm">
-      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-        <span className="invisible text-gray-500 sm:text-sm md:visible">£</span>
+    <div className="flex justify-center">
+      <div className="relative flex rounded-md py-2 shadow-sm">
+        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2">
+          <span className="visible text-gray-500 sm:text-sm">£</span>
+        </div>
+        <input
+          type="number"
+          value={value.toFixed(0)}
+          onChange={(e) => setValue(parseInt(e.target.value))}
+          onBlur={onBlur}
+          className="min-w-20 w-20 rounded-md border-0 pl-5 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 [appearance:textfield] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[hsl(216,92%,76%)] sm:py-1.5"
+        />
       </div>
-      <input
-        type="number"
-        value={value.toFixed(0)}
-        onChange={(e) => setValue(parseInt(e.target.value))}
-        onBlur={onBlur}
-        className="flex w-full rounded-md border-0 pl-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[hsl(216,92%,76%)] sm:py-1.5 sm:text-sm sm:leading-6 md:pl-7"
-      />
     </div>
   );
 };
