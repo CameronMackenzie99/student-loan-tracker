@@ -6,12 +6,14 @@ import {
 } from "@tanstack/react-table";
 import type { FormType } from "./LoanForm";
 import { columns } from "./columns";
-import { useEffect, useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CalcOptions } from "../calc/projection";
 import { calculateFullData } from "../calc/projection";
 import { defaultRowOptions } from "../calc/defaultRowOptions";
 import { RecalculateSubsequentRows } from "../calc/partialUpdate";
 import { OptionsContext } from "../calc/defaultOptions";
+import { LineGraph } from "./visualisations/LineGraph";
 
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -39,34 +41,51 @@ export type YearRow = {
   yearsUntilWiped: number;
 };
 
-export const LoanTable = (formInput: FormType) => {
-  const options = {
-    graduatingYear: formInput.graduatingYear,
-    loanBalance: formInput.loanBalance,
-    loanPeriod: 40,
-    repaymentThreshold: 27295,
-    salary: 30000,
-    rowOptions: defaultRowOptions,
-  };
+export const LoanProjection = (formInput: FormType) => {
+  const options = useMemo(() => {
+    return {
+      graduatingYear: formInput.graduatingYear,
+      loanBalance: formInput.loanBalance,
+      loanPeriod: 30,
+      repaymentThreshold: 27295,
+      salary: 30000,
+      rowOptions: defaultRowOptions,
+    };
+  }, [formInput]);
 
-  const tableData = calculateFullData([], options);
+  const tableData = useMemo(() => calculateFullData([], options), [options]);
+
+  const [clientData, setClientData] = useState<YearRow[]>(tableData);
+
+  useEffect(() => {
+    setClientData(tableData);
+  }, [tableData]);
 
   return (
     <OptionsContext.Provider value={options}>
-      <LoanTableGrid rows={...tableData} />
+      <LoanTableGrid rows={...clientData} setRows={setClientData} />
+      <LineGraph
+        data={clientData.map((row) => {
+          return {
+            calendarYear: row.calendarYear,
+            totalDebt: row.totalDebt,
+            totalRepaid: row.totalRepaid,
+          };
+        })}
+      />
     </OptionsContext.Provider>
   );
 };
 
-const LoanTableGrid = (props: { rows: YearRow[] }) => {
-  const [clientData, setClientData] = useState([...props.rows]);
-
-  useEffect(() => {
-    setClientData([...props.rows]);
-  }, [props.rows]);
-
+const LoanTableGrid = ({
+  rows,
+  setRows,
+}: {
+  rows: YearRow[];
+  setRows: Dispatch<SetStateAction<YearRow[]>>;
+}) => {
   const table = useReactTable({
-    data: clientData,
+    data: rows,
     columns,
     getCoreRowModel: getCoreRowModel<YearRow>(),
     meta: {
@@ -76,9 +95,9 @@ const LoanTableGrid = (props: { rows: YearRow[] }) => {
         value: number,
         options: CalcOptions
       ) => {
-        setClientData(
+        setRows(
           RecalculateSubsequentRows(
-            [...clientData],
+            [...rows],
             rowIndex,
             columnId,
             value,
@@ -92,7 +111,7 @@ const LoanTableGrid = (props: { rows: YearRow[] }) => {
   return (
     <div className="overflow-hidden rounded-xl">
       <div
-        className="block max-h-screen max-w-full overflow-auto rounded-lg border border-gray-300 bg-gray-50 px-2 text-gray-900 sm:text-sm"
+        className="block max-h-screen max-w-full overflow-auto rounded-md border border-gray-300 bg-gray-50 px-2 text-gray-900 sm:text-sm"
         id="result"
       >
         <table className="mt-2 min-w-full divide-y divide-gray-200 sm:min-w-full">

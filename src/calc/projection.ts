@@ -1,4 +1,4 @@
-import type { YearRow } from "../components/LoanTable";
+import type { YearRow } from "../components/LoanProjection";
 
 export interface RowOptions {
   averageSalaryGrowth: number;

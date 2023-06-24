@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import type { CellContext } from "@tanstack/react-table";
-import type { YearRow } from "./LoanTable";
+import type { YearRow } from "./LoanProjection";
 import { OptionsContext } from "../calc/defaultOptions";
 
 export const EditableCell = ({

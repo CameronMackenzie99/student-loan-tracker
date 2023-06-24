@@ -2,7 +2,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { EditableCell } from "./EditableCell";
 import { formatCurrency } from "../utils/formatCurrency";
 import { formatTaxYear } from "../utils/formatTaxYear";
-import type { YearRow } from "./LoanTable";
+import type { YearRow } from "./LoanProjection";
 
 const columnHelper = createColumnHelper<YearRow>();
 
