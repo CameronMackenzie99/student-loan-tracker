@@ -14,6 +14,7 @@ import { defaultRowOptions } from "../calc/defaultRowOptions";
 import { RecalculateSubsequentRows } from "../calc/partialUpdate";
 import { OptionsContext } from "../calc/defaultOptions";
 import { LineGraph } from "./visualisations/LineGraph";
+import { calculateRealValue } from "../utils/calculateRealValue";
 
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -27,18 +28,22 @@ declare module "@tanstack/react-table" {
   }
 }
 
+export type YearRowLabels = {
+  currentLoanYear: "Current Loan Year";
+  graduatingYear: "Graduating Year";
+  salary: "Salary";
+  calendarYear: "Tax Year";
+  totalDebt: "Total Debt";
+  interestRate: "Interest Rate";
+  annualInterest: "Annual Interest";
+  repaymentThreshold: "Repayment Threshold";
+  annualRepayment: "Annual Repayment";
+  totalRepaid: "Total Repaid";
+  yearsUntilWiped: "Years until Wiped";
+};
+
 export type YearRow = {
-  currentLoanYear: number;
-  graduatingYear: number;
-  salary: number;
-  calendarYear: number;
-  totalDebt: number;
-  interestRate: number;
-  annualInterest: number;
-  repaymentThreshold: number;
-  annualRepayment: number;
-  totalRepaid: number;
-  yearsUntilWiped: number;
+  [R in keyof YearRowLabels]: number;
 };
 
 export const LoanProjection = (formInput: FormType) => {
@@ -64,15 +69,53 @@ export const LoanProjection = (formInput: FormType) => {
   return (
     <OptionsContext.Provider value={options}>
       <LoanTableGrid rows={...clientData} setRows={setClientData} />
-      <LineGraph
-        data={clientData.map((row) => {
-          return {
-            calendarYear: row.calendarYear,
-            totalDebt: row.totalDebt,
-            totalRepaid: row.totalRepaid,
-          };
-        })}
-      />
+      <div className="mt-4 flex h-fit w-full flex-wrap rounded-lg border border-gray-300 bg-gray-50 ">
+        <LineGraph
+          data={clientData.map((row) => {
+            return {
+              calendarYear: row.calendarYear,
+              totalDebt: row.totalDebt,
+              totalRepaid: row.totalRepaid,
+            };
+          })}
+          independentVariable="calendarYear"
+          series={["totalDebt", "totalRepaid"]}
+          labels={["Total Debt", "Total Repaid"]}
+          width={100}
+          title="Total Repaid and Loan Balance"
+        />
+        <LineGraph
+          data={clientData.map((row) => {
+            return {
+              calendarYear: row.calendarYear,
+              salary: row.salary,
+              realSalary: calculateRealValue(row.salary, row.calendarYear),
+            };
+          })}
+          independentVariable="calendarYear"
+          series={["salary", "realSalary"]}
+          labels={["Salary", "Real Salary"]}
+          width={50}
+          title="Nominal vs Real Salary"
+        />
+        <LineGraph
+          data={clientData.map((row) => {
+            return {
+              calendarYear: row.calendarYear,
+              annualRepayment: row.annualRepayment,
+              realRepayment: calculateRealValue(
+                row.annualRepayment,
+                row.calendarYear
+              ),
+            };
+          })}
+          independentVariable="calendarYear"
+          series={["annualRepayment", "realRepayment"]}
+          labels={["Annual Repayment", "Real Repayment"]}
+          width={50}
+          title="Nominal vs Real Repayments"
+        />
+      </div>
     </OptionsContext.Provider>
   );
 };
