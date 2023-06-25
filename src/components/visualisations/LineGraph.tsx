@@ -13,7 +13,7 @@ import React from "react";
 import { formatCurrency } from "../../utils/formatCurrency";
 import type { YearRow, YearRowLabels } from "../LoanProjection";
 
-type LineGraphProps<T, U> = {
+type LineGraphProps<T, U extends Record<string, string>> = {
   data: T[];
   independentVariable: keyof T extends string ? keyof T : never;
   series: (keyof T)[];
@@ -51,7 +51,7 @@ export function LineGraph<T extends Partial<YearRow>, U extends YearRowLabels>({
           {series.map((serie) => (
             <Line
               key={serie.toString()}
-              name={labels[series.indexOf(serie)]}
+              name={labels[series.indexOf(serie)] as string}
               type="monotone"
               dataKey={`${serie.toString()}`}
               stroke={COLOURS.pop()}
