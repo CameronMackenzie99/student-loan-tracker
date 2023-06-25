@@ -4,7 +4,7 @@ import Head from "next/head";
 import { useState } from "react";
 import type { FormType } from "../components/LoanForm";
 import { LoanForm } from "../components/LoanForm";
-import { LoanTable } from "../components/LoanTable";
+import { LoanProjection } from "../components/LoanProjection";
 
 const Home: NextPage = () => {
   const [formData, setFormData] = useState<FormType>();
@@ -29,7 +29,7 @@ const Home: NextPage = () => {
           <div className="w-full flex-row gap-4 sm:w-full md:gap-8">
             <LoanForm onFormDataChange={onFormDataChange} />
             {formData && (
-              <LoanTable
+              <LoanProjection
                 loanBalance={formData?.loanBalance}
                 graduatingYear={formData?.graduatingYear}
               />
