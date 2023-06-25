@@ -22,10 +22,7 @@ type LineGraphProps<T, U> = {
   title: string;
 };
 
-export function LineGraph<
-  T extends Partial<YearRow>,
-  U extends Partial<YearRowLabels>
->({
+export function LineGraph<T extends Partial<YearRow>, U extends YearRowLabels>({
   data,
   independentVariable,
   series,
