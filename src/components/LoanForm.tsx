@@ -36,7 +36,7 @@ export const LoanForm = ({ onFormDataChange }: FormSetter) => {
         <div>
           <label
             htmlFor="loanBalance"
-            className="mb-2 block text-sm font-medium text-white"
+            className="mb-2 block text-sm font-medium dark:text-white"
           >
             Current Loan Balance:
           </label>
@@ -56,7 +56,7 @@ export const LoanForm = ({ onFormDataChange }: FormSetter) => {
         <div>
           <label
             htmlFor="graduatingYear"
-            className="mb-2 block text-sm font-medium text-white"
+            className="mb-2 block text-sm font-medium dark:text-white"
           >
             Graduating Year:
           </label>
@@ -78,7 +78,7 @@ export const LoanForm = ({ onFormDataChange }: FormSetter) => {
       <div className="flex flex-col items-center justify-center">
         <input
           type="submit"
-          className="focus-visible:ring-ring ring-offset-background inline-flex h-10 w-20 items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          className="ring-offset-background inline-flex h-10 w-20 items-center justify-center rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
           disabled={isSubmitting}
         />
       </div>
