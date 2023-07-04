@@ -51,7 +51,7 @@ export const calculateFullData = (rows: YearRow[], options: CalcOptions) => {
   return resultRows;
 };
 
-export type RowInputs = Pick<
+type RowInputs = Pick<
   YearRow,
   "totalDebt" | "interestRate" | "annualRepayment" | "totalRepaid"
 >;
@@ -101,20 +101,22 @@ export const calculateInitialYearRow = (
     rowInputs.interestRate
   );
 
-  const annualRepayment = calculateAnnualRepayment(
-    options.salary,
-    options.repaymentThreshold,
-    options.loanBalance,
-    annualInterest,
-    options.rowOptions
-  );
-
-  const totalRepaid = 0 + annualRepayment;
-
   const currentLoanYear = calculateCurrentLoanYear(
     options.graduatingYear,
     CURRENT_YEAR
   );
+
+  const annualRepayment =
+    currentLoanYear > 0
+      ? calculateAnnualRepayment(
+          options.salary,
+          options.repaymentThreshold,
+          options.loanBalance,
+          annualInterest,
+          options.rowOptions
+        )
+      : 0;
+  const totalRepaid = 0 + annualRepayment;
 
   const yearsUntilWiped = calculateYearsUntilWiped(
     options.loanPeriod,
@@ -159,13 +161,16 @@ export const calculateYearRow = (prevRow: YearRow, rowOptions: RowOptions) => {
   const repaymentThreshold =
     prevRow.repaymentThreshold * rowOptions.repaymentThresholdGrowth;
 
-  const annualRepayment = calculateAnnualRepayment(
-    adjustedSalary,
-    repaymentThreshold,
-    totalDebt,
-    annualInterest,
-    rowOptions
-  );
+  const annualRepayment =
+    currentLoanYear > 0
+      ? calculateAnnualRepayment(
+          adjustedSalary,
+          repaymentThreshold,
+          totalDebt,
+          annualInterest,
+          rowOptions
+        )
+      : 0;
 
   return {
     currentLoanYear: currentLoanYear,
@@ -183,10 +188,7 @@ export const calculateYearRow = (prevRow: YearRow, rowOptions: RowOptions) => {
 };
 
 function calculateYearsUntilWiped(loanPeriod: number, graduatingYear: number) {
-  return (
-    loanPeriod -
-    (CURRENT_YEAR - graduatingYear >= 0 ? CURRENT_YEAR - graduatingYear - 1 : 0)
-  );
+  return loanPeriod - (CURRENT_YEAR - graduatingYear - 1);
 }
 
 function calculateCurrentLoanYear(
