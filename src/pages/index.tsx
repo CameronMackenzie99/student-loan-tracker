@@ -28,19 +28,9 @@ const Home: NextPage = () => {
           </h1>
           <article className="">
             <p className="mx-auto w-2/3 text-xl dark:text-white">
-              Student loans are a necessity for most when going to uni. Often
-              times, you will hear the mantra - &quot;Student loans are
-              effectively a graduate tax! Most will never pay them off in
-              full&quot; And while to a certain extent this is true, with the
-              new Plan 5 loans, many will still be making payments into their
-              retirement, particularly those who attend as mature students. It
-              is often hard to weigh up this financial decision, and once
-              graduated, the impact that any overpayments will have on your loan
-              overall. This tool is designed to demystify what your loan may
-              look like in decades time, and how differing income levels at
-              various points in your life can massively change how much you
-              repay, if any. It currently only works for Plan 2 loans (undergrad
-              degrees post 2012) but will soon be expanded to cover all plans.
+              This tool is designed to demystify what your student loan may look
+              like in decades time, and how differing income levels at various
+              points in your life can significantly change how much you repay.
             </p>
           </article>
           <div className="w-full flex-row gap-4 sm:w-full md:gap-8">
@@ -49,6 +39,7 @@ const Home: NextPage = () => {
               <LoanProjection
                 loanBalance={formData?.loanBalance}
                 graduatingYear={formData?.graduatingYear}
+                plan={formData?.plan}
               />
             )}
           </div>
