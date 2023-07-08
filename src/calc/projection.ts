@@ -51,7 +51,7 @@ export const calculateFullData = (rows: YearRow[], options: CalcOptions) => {
   return resultRows;
 };
 
-type RowInputs = Pick<
+export type RowInputs = Pick<
   YearRow,
   "totalDebt" | "interestRate" | "annualRepayment" | "totalRepaid"
 >;
