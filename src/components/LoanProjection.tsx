@@ -10,11 +10,15 @@ import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useMemo, useState } from "react";
 import type { CalcOptions } from "../calc/projection";
 import { calculateFullData } from "../calc/projection";
-import { defaultRowOptions } from "../calc/defaultRowOptions";
+import {
+  AVERAGE_SALARY_GROWTH,
+  REPAYMENT_THRESHOLD_GROWTH,
+} from "../calc/defaultRowOptions";
 import { RecalculateSubsequentRows } from "../calc/partialUpdate";
 import { OptionsContext } from "../calc/defaultOptions";
 import { LineGraph } from "./visualisations/LineGraph";
 import { calculateRealValue } from "../utils/calculateRealValue";
+import { planOptions } from "../calc/planOptions";
 
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -47,14 +51,20 @@ export type YearRow = {
 };
 
 export const LoanProjection = (formInput: FormType) => {
-  const options = useMemo(() => {
+  const options: CalcOptions = useMemo(() => {
     return {
       graduatingYear: formInput.graduatingYear,
       loanBalance: formInput.loanBalance,
-      loanPeriod: 30,
-      repaymentThreshold: 27295,
+      loanPeriod: planOptions[formInput.plan].loanPeriod,
+      repaymentThreshold: planOptions[formInput.plan].repaymentThreshold,
       salary: 30000,
-      rowOptions: defaultRowOptions,
+      rowOptions: {
+        averageSalaryGrowth: AVERAGE_SALARY_GROWTH,
+        incomePercentageTaxedOverThreshold:
+          planOptions[formInput.plan].incomePercentageTaxedOverThreshold,
+        interestRate: planOptions[formInput.plan].interestRate,
+        repaymentThresholdGrowth: REPAYMENT_THRESHOLD_GROWTH,
+      },
     };
   }, [formInput]);
 
