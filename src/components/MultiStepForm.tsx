@@ -22,12 +22,12 @@ type FormState2 =
   | {
       student: "current";
       plan: "plan1" | "plan2" | "plan3" | "plan4" | "plan5";
-      data?: CourseFormType;
+      data?: CourseFormData;
     }
   | {
       student: "graduate";
       plan: "plan1" | "plan2" | "plan3" | "plan4" | "plan5";
-      data?: LoanForm;
+      data?: LoanFormData;
     };
 
 // const FORM_STATE: FormState = {
@@ -65,14 +65,7 @@ type FormStateContext = {
 
 const FormStateContext = createContext<FormStateContext | null>(null);
 
-type PropsFrom<TComponent> = TComponent extends React.FC<infer Props>
-  ? Props
-  : never;
-
-function SecondStep(
-  student: "current" | "graduate",
-  props: PropsFrom<typeof CourseForm>
-) {
+function SecondStep(student: "current" | "graduate", props: SubFormProps) {
   if (student === "current") {
     return (
       <CourseForm
@@ -150,23 +143,26 @@ export const MultiStepForm = () => {
   );
 };
 
+type SubFormProps = {
+  form: FormState2;
+  setForm: Dispatch<SetStateAction<FormState2>>;
+  onNext: () => void;
+  onPrev?: () => void;
+};
+
 const YouSchema = z.object({
   student: z.enum(["current", "graduate"]),
   plan: z.enum(["plan1", "plan2", "plan3", "plan4", "plan5"]),
 });
 
-type YouForm = z.infer<typeof YouSchema>;
+type YouFormData = z.infer<typeof YouSchema>;
 
-function YouForm(props: {
-  form: FormState2;
-  setForm: Dispatch<SetStateAction<FormState2>>;
-  onNext: () => void;
-}) {
+function YouForm(props: SubFormProps) {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<YouForm>({
+  } = useForm<YouFormData>({
     defaultValues: { student: props.form.student, plan: props.form.plan },
     resolver: zodResolver(YouSchema),
   });
@@ -236,19 +232,14 @@ const CourseSchema = z.object({
   yearlyMaintenance: z.coerce.number().min(0),
 });
 
-type CourseFormType = z.infer<typeof CourseSchema>;
+type CourseFormData = z.infer<typeof CourseSchema>;
 
-const CourseForm = (props: {
-  form: FormState2;
-  setForm: Dispatch<SetStateAction<FormState2>>;
-  onNext: () => void;
-  onPrev: () => void;
-}) => {
+const CourseForm = (props: SubFormProps) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<CourseFormType>({
+  } = useForm<CourseFormData>({
     resolver: zodResolver(CourseSchema),
   });
 
@@ -309,19 +300,14 @@ const LoanSchema = z.object({
     .max(new Date().getFullYear() + 10),
 });
 
-type LoanForm = z.infer<typeof LoanSchema>;
+type LoanFormData = z.infer<typeof LoanSchema>;
 
-function LoanForm(props: {
-  form: FormState2;
-  setForm: Dispatch<SetStateAction<FormState2>>;
-  onNext: () => void;
-  onPrev: () => void;
-}) {
+function LoanForm(props: SubFormProps) {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoanForm>({
+  } = useForm<LoanFormData>({
     resolver: zodResolver(LoanSchema),
   });
 
