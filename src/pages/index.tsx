@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { FormType } from "../components/LoanForm";
 import { LoanForm } from "../components/LoanForm";
 import { LoanProjection } from "../components/LoanProjection";
+import { MultiStepForm } from "../components/MultiStepForm";
 
 const Home: NextPage = () => {
   const [formData, setFormData] = useState<FormType>();
@@ -34,6 +35,7 @@ const Home: NextPage = () => {
             </p>
           </article>
           <div className="w-full flex-row gap-4 sm:w-full md:gap-8">
+            <MultiStepForm />
             <LoanForm onFormDataChange={onFormDataChange} />
             {formData && (
               <LoanProjection
