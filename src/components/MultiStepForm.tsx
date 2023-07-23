@@ -26,20 +26,21 @@ import {
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "./ui/button";
+import { cn } from "@/lib/utils";
 
-type FormState =
+export type FormDataType =
   | {
       student: "current";
       plan: "plan1" | "plan2" | "plan3" | "plan4" | "plan5";
-      data?: CourseFormData;
+      data?: CurrentStudentData;
     }
   | {
       student: "graduate";
       plan: "plan1" | "plan2" | "plan3" | "plan4" | "plan5";
-      data?: LoanFormData;
+      data?: GraduateStudentData;
     };
 
-const FORM_STATE: FormState = {
+const FORM_STATE: FormDataType = {
   student: "current",
   plan: "plan5",
 };
@@ -69,8 +70,12 @@ function RenderSecondStepForm(
   }
 }
 
-export const MultiStepForm = () => {
-  const [form, setForm] = useState<FormState>(FORM_STATE);
+export type MultiStepFormProps = {
+  handleFormDataChange: (data: FormDataType) => void;
+};
+
+export const MultiStepForm = ({ handleFormDataChange }: MultiStepFormProps) => {
+  const [form, setForm] = useState<FormDataType>(FORM_STATE);
 
   const steps: Steps[] = useMemo(
     () => [
@@ -89,21 +94,26 @@ export const MultiStepForm = () => {
   });
 
   useEffect(() => {
-    if (state.currentStep === 2) console.log(form);
-  }, [state.currentStep, form]);
+    if (state.currentStep === 2) {
+      console.log(form);
+      handleFormDataChange(form);
+    }
+  }, [state.currentStep, form, handleFormDataChange]);
 
   return (
-    <Card className="mx-auto w-2/3">
+    <Card className="mx-auto md:w-2/3">
       <CardHeader>
-        <nav className="flex justify-between px-20 py-4" {...stepperProps}>
+        <nav
+          className="flex justify-between border-b px-8 py-4 sm:px-20"
+          {...stepperProps}
+        >
           {stepsProps?.map((step, index) => (
             <div
               key={index}
-              className={
-                state.currentStep === index
-                  ? "border-b border-slate-900 p-2"
-                  : "p-2"
-              }
+              className={cn(
+                "p-2",
+                state.currentStep === index && "border-b border-slate-900"
+              )}
               // {...step}
             >
               {steps[index]?.label}
@@ -129,8 +139,8 @@ export const MultiStepForm = () => {
 };
 
 type SubFormProps = {
-  form: FormState;
-  setForm: Dispatch<SetStateAction<FormState>>;
+  form: FormDataType;
+  setForm: Dispatch<SetStateAction<FormDataType>>;
   onNext: () => void;
   onPrev?: () => void;
 };
@@ -237,10 +247,10 @@ const CourseSchema = z.object({
   yearlyMaintenance: z.coerce.number().min(0),
 });
 
-type CourseFormData = z.infer<typeof CourseSchema>;
+type CurrentStudentData = z.infer<typeof CourseSchema>;
 
 const CourseForm = (props: SubFormProps) => {
-  const form = useForm<CourseFormData>({
+  const form = useForm<CurrentStudentData>({
     resolver: zodResolver(CourseSchema),
     defaultValues: {
       courseLength: 3,
@@ -290,7 +300,7 @@ const CourseForm = (props: SubFormProps) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                What year did do you plan to start your course?
+                What year did / do you plan to start your course?
               </FormLabel>
               <FormControl>
                 <Input
@@ -346,10 +356,10 @@ const LoanSchema = z.object({
     .max(new Date().getFullYear() + 10),
 });
 
-type LoanFormData = z.infer<typeof LoanSchema>;
+type GraduateStudentData = z.infer<typeof LoanSchema>;
 
 function LoanForm(props: SubFormProps) {
-  const form = useForm<LoanFormData>({
+  const form = useForm<GraduateStudentData>({
     defaultValues: {
       currentLoanBalance: 50000,
       graduatingYear: 2022,
