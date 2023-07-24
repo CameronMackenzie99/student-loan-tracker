@@ -23,10 +23,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
+import { InputSummary } from "./InputSummary";
 
 export type FormDataType =
   | {
@@ -89,9 +89,10 @@ export const MultiStepForm = ({ handleFormDataChange }: MultiStepFormProps) => {
     []
   );
 
-  const { state, nextStep, prevStep, stepsProps, stepperProps } = useStepper({
-    steps,
-  });
+  const { state, nextStep, prevStep, stepsProps, stepperProps, setStep } =
+    useStepper({
+      steps,
+    });
 
   useEffect(() => {
     if (state.currentStep === 2) {
@@ -101,7 +102,7 @@ export const MultiStepForm = ({ handleFormDataChange }: MultiStepFormProps) => {
   }, [state.currentStep, form, handleFormDataChange]);
 
   return (
-    <Card className="mx-auto md:w-2/3">
+    <Card className="mx-auto md:h-[34rem] md:w-2/3">
       <CardHeader>
         <nav
           className="flex justify-between border-b px-8 py-4 sm:px-20"
@@ -121,7 +122,7 @@ export const MultiStepForm = ({ handleFormDataChange }: MultiStepFormProps) => {
           ))}
         </nav>
       </CardHeader>
-      <CardContent className="p-8">
+      <CardContent>
         {state.currentStep === 0 && (
           <YouForm form={form} setForm={setForm} onNext={nextStep} />
         )}
@@ -132,7 +133,9 @@ export const MultiStepForm = ({ handleFormDataChange }: MultiStepFormProps) => {
             onNext: nextStep,
             onPrev: prevStep,
           })}
-        {state.currentStep === 2 && <pre>{JSON.stringify(form, null, 2)}</pre>}
+        {state.currentStep === 2 && (
+          <InputSummary form={form} setStep={setStep} />
+        )}
       </CardContent>
     </Card>
   );
@@ -168,71 +171,83 @@ function YouForm(props: SubFormProps) {
           });
           props.onNext();
         })}
-        className="w-2/3 space-y-6"
+        className="w-full space-y-6"
       >
-        <FormField
-          control={form.control}
-          name="student"
-          render={({ field }) => (
-            <FormItem className="space-y-3">
-              <FormLabel>
-                Are you a current / prospective student, or a graduate?
-              </FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="flex flex-col space-y-1"
-                >
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="current" />
-                    </FormControl>
-                    <FormLabel className="font-normal">
-                      Current or prospective student
-                    </FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="graduate" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Graduate</FormLabel>
-                  </FormItem>
-                </RadioGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="plan"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Plan</FormLabel>
-              <Select onValueChange={field.onChange}>
+        <div className=" space-y-6">
+          <FormField
+            control={form.control}
+            name="student"
+            render={({ field }) => (
+              <FormItem className="space-y-3">
+                <FormLabel>
+                  Are you a current / prospective student, or a graduate?
+                </FormLabel>
                 <FormControl>
-                  <SelectTrigger className="w-fit">
-                    <SelectValue placeholder="Select your student loan plan" />
-                  </SelectTrigger>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-col space-y-1"
+                  >
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="current" />
+                      </FormControl>
+                      <FormLabel className="font-normal">
+                        Current or prospective student
+                      </FormLabel>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="graduate" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Graduate</FormLabel>
+                    </FormItem>
+                  </RadioGroup>
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="plan1">Plan 1</SelectItem>
-                  <SelectItem value="plan2">Plan 2</SelectItem>
-                  <SelectItem value="plan3">Plan 3</SelectItem>
-                  <SelectItem value="plan4">Plan 4</SelectItem>
-                  <SelectItem value="plan5">Plan 5</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormDescription>
-                You can see which plan you are on{" "}
-                <Link href="/examples/forms">on the gov.uk website</Link>.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit">Next</Button>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="plan"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Plan</FormLabel>
+                <Select onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger className="w-fit">
+                      <SelectValue placeholder="Select your student loan plan" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="plan1">Plan 1</SelectItem>
+                    <SelectItem value="plan2">Plan 2</SelectItem>
+                    <SelectItem value="plan3">Plan 3</SelectItem>
+                    <SelectItem value="plan4">Plan 4</SelectItem>
+                    <SelectItem value="plan5">Plan 5</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  You can see which plan you are on{" "}
+                  <a
+                    href="https://www.gov.uk/repaying-your-student-loan/which-repayment-plan-you-are-on"
+                    className="font-medium text-primary underline underline-offset-4"
+                  >
+                    on the gov.uk website
+                  </a>
+                  . If you are starting your course in 2023 or later, and
+                  studying an undergraduate degree in England you will most
+                  likely be on Plan 5.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div>
+          <Button type="submit">Next</Button>
+        </div>
       </form>
     </Form>
   );
@@ -242,9 +257,10 @@ const CourseSchema = z.object({
   courseLength: z.coerce.number().min(1).max(10),
   courseStartYear: z.coerce
     .number()
-    .min(1980)
+    .min(2015)
     .max(new Date().getFullYear() + 10),
   yearlyMaintenance: z.coerce.number().min(0),
+  yearlyTuition: z.coerce.number().min(0),
 });
 
 type CurrentStudentData = z.infer<typeof CourseSchema>;
@@ -256,6 +272,7 @@ const CourseForm = (props: SubFormProps) => {
       courseLength: 3,
       courseStartYear: 2023,
       yearlyMaintenance: 7000,
+      yearlyTuition: 9250,
     },
   });
 
@@ -271,7 +288,7 @@ const CourseForm = (props: SubFormProps) => {
           }
           props.onNext();
         })}
-        className="w-2/3 space-y-6"
+        className="w-full space-y-6"
       >
         <FormField
           control={form.control}
@@ -288,7 +305,7 @@ const CourseForm = (props: SubFormProps) => {
                 />
               </FormControl>
               <FormDescription>
-                Most undergraduate courses are 3 years long
+                Most undergraduate courses are 3 years long.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -332,8 +349,21 @@ const CourseForm = (props: SubFormProps) => {
                 />
               </FormControl>
               <FormDescription>
-                You can find out what loan you are entitled to{" "}
-                <Link href="/examples/forms">on the gov.uk website</Link>.
+                You can find out what maintenance loan you are entitled to{" "}
+                <a
+                  href="https://www.gov.uk/student-finance/new-fulltime-students"
+                  className="font-medium text-primary underline underline-offset-4"
+                >
+                  on the gov.uk website
+                </a>
+                . They also have a calculator{" "}
+                <a
+                  href="https://www.gov.uk/student-finance-calculator"
+                  className="font-medium text-primary underline underline-offset-4"
+                >
+                  here
+                </a>
+                .
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -350,10 +380,7 @@ const CourseForm = (props: SubFormProps) => {
 
 const LoanSchema = z.object({
   currentLoanBalance: z.coerce.number().positive(),
-  graduatingYear: z.coerce
-    .number()
-    .min(1980)
-    .max(new Date().getFullYear() + 10),
+  graduatingYear: z.coerce.number().min(1980).max(new Date().getFullYear()),
 });
 
 type GraduateStudentData = z.infer<typeof LoanSchema>;
@@ -386,7 +413,7 @@ function LoanForm(props: SubFormProps) {
           name="currentLoanBalance"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>What is your current loan balance?</FormLabel>
+              <FormLabel>What is your current student loan balance?</FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -397,9 +424,9 @@ function LoanForm(props: SubFormProps) {
               </FormControl>
               <FormDescription>
                 You can find out your loan balance{" "}
-                <Link href="/examples/forms">
+                <a href="https://www.gov.uk/government/organisations/student-loans-company">
                   on the student loans company website
-                </Link>
+                </a>
                 . This may differ if you are studying in Scotland, Wales or NI.
               </FormDescription>
               <FormMessage />

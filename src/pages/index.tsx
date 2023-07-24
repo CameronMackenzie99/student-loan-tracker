@@ -2,15 +2,14 @@ import { type NextPage } from "next";
 import Head from "next/head";
 
 import { useState } from "react";
-import type { FormType } from "../components/LoanForm";
-import { LoanForm } from "../components/LoanForm";
 import { LoanProjection } from "../components/LoanProjection";
+import type { FormDataType } from "../components/MultiStepForm";
 import { MultiStepForm } from "../components/MultiStepForm";
 
 const Home: NextPage = () => {
-  const [formData, setFormData] = useState<FormType>();
+  const [formData, setFormData] = useState<FormDataType>();
 
-  const onFormDataChange = (data: FormType) => {
+  const onFormDataChange = (data: FormDataType) => {
     setFormData(data);
   };
 
@@ -25,9 +24,9 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="max-w-screen flex min-h-screen flex-col items-center bg-primary text-primary-foreground">
-        <header className="sticky top-0 z-40 w-full border-b bg-primary p-4">
+        <header className="sticky top-0 z-40 w-full bg-primary p-4">
           <div className="container flex h-12 items-center justify-between py-4">
-            <h1 className="text-2xl tracking-tighter dark:text-white md:text-4xl">
+            <h1 className="text-2xl font-bold tracking-tight md:text-4xl">
               Student Loan Tracker
             </h1>
           </div>
@@ -37,26 +36,18 @@ const Home: NextPage = () => {
             <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
               Visualisation
             </h2>
-            <p className="text-xl">
+            <p className="text-xl leading-7">
               This tool is designed to demystify what your student loan may look
               like in decades time, and how differing income levels at various
               points in your life can significantly change how much you repay.
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quas
-              laudantium aut saepe numquam consectetur, corrupti, recusandae
-              dicta alias enim nulla nesciunt quasi est architecto nemo quisquam
-              minus quo corporis provident!
+              Complete the form below to visualise your loan. You can modify any
+              of the salary cells, and the salaries in the rows below will be
+              recalculated in line with average salary growth.
             </p>
           </article>
-          <div className="w-full flex-row gap-4 sm:w-full md:gap-8">
-            <MultiStepForm />
-            <LoanForm onFormDataChange={onFormDataChange} />
-            {formData && (
-              <LoanProjection
-                loanBalance={formData?.loanBalance}
-                graduatingYear={formData?.graduatingYear}
-                plan={formData?.plan}
-              />
-            )}
+          <div className="flex w-full flex-col gap-4 md:gap-8">
+            <MultiStepForm handleFormDataChange={onFormDataChange} />
+            {formData && <LoanProjection formInput={formData} />}
           </div>
         </section>
       </main>

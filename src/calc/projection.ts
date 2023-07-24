@@ -1,10 +1,13 @@
+import type { FormDataType } from "@/components/MultiStepForm";
 import type { YearRow } from "../components/LoanProjection";
+import { calcInflation } from "./inflationAdjustment";
 
 export interface RowOptions {
   averageSalaryGrowth: number;
   repaymentThresholdGrowth: number;
   incomePercentageTaxedOverThreshold: number;
-  interestRate: number;
+  planInterestRate: number;
+  averageInterestRate: number;
 }
 
 export interface CalcOptions {
@@ -12,43 +15,54 @@ export interface CalcOptions {
   repaymentThreshold: number;
   salary: number;
   graduatingYear: number;
-  loanBalance: number;
   rowOptions: RowOptions;
   //TODO: plan - may incorporate weekly changes to threshold/interest
 }
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-export const calculateFullData = (rows: YearRow[], options: CalcOptions) => {
-  let [startingRow] = rows.slice(-1);
+export const calculateFullData = (
+  formInput: FormDataType,
+  options: CalcOptions
+) => {
+  let rows: (YearRow | PreGradYearRow)[] = [];
 
-  const yearsUntilWiped = calculateYearsUntilWiped(
-    options.loanPeriod,
-    options.graduatingYear
-  );
-  if (startingRow === undefined) {
-    startingRow = calculateInitialYearRow(
-      {
-        totalDebt: options.loanBalance,
-        annualRepayment: 0,
-        totalRepaid: 0,
-        interestRate: options.rowOptions.interestRate,
-      },
-      options
+  if (!formInput.data) {
+    throw new Error("data is undefined");
+  }
+
+  let rowsToCalculateCount = 0;
+
+  if (formInput.student === "current") {
+    rows = calculatePreGraduationRows(
+      formInput.data.courseStartYear,
+      formInput.data.courseLength,
+      formInput.data.yearlyMaintenance + formInput.data.yearlyTuition,
+      options.rowOptions.planInterestRate
     );
+    rowsToCalculateCount = options.loanPeriod;
   }
 
-  const resultRows = [startingRow];
-
-  while (resultRows.length <= yearsUntilWiped) {
-    const lastRow = resultRows[resultRows.length - 1];
-    if (lastRow == undefined) break;
-    const newRow = calculateYearRow(lastRow, options.rowOptions);
-    if (newRow.yearsUntilWiped === 0 || Math.round(newRow.totalDebt) === 0)
-      break;
-    resultRows.push(newRow);
+  if (formInput.student === "graduate") {
+    rows.push(
+      calculateInitialYearRow(
+        {
+          totalDebt: formInput.data.currentLoanBalance,
+          annualRepayment: 0,
+          totalRepaid: 0,
+          interestRate: options.rowOptions.planInterestRate,
+        },
+        options
+      )
+    );
+    rowsToCalculateCount = (rows.at(-1)?.yearsUntilWiped ?? 0) - 1;
   }
-  return resultRows;
+
+  return calculateSubsequentRows(
+    rowsToCalculateCount,
+    options,
+    rows as YearRow[]
+  );
 };
 
 export type RowInputs = Pick<
@@ -71,23 +85,16 @@ export const recalculateEditedRow = (
     editedRow.repaymentThreshold,
     editedRow.totalDebt,
     annualInterest,
-    options.rowOptions
+    options.rowOptions.incomePercentageTaxedOverThreshold
   );
 
   const totalRepaid = rowInputs.totalRepaid + annualRepayment;
 
   return {
-    currentLoanYear: editedRow.currentLoanYear,
-    graduatingYear: editedRow.graduatingYear,
-    salary: editedRow.salary,
-    calendarYear: editedRow.calendarYear,
-    totalDebt: editedRow.totalDebt,
-    interestRate: editedRow.interestRate,
+    ...editedRow,
     annualInterest: annualInterest,
-    repaymentThreshold: editedRow.repaymentThreshold,
     annualRepayment: annualRepayment,
     totalRepaid: totalRepaid,
-    yearsUntilWiped: editedRow.yearsUntilWiped,
   };
 };
 
@@ -111,24 +118,25 @@ export const calculateInitialYearRow = (
       ? calculateAnnualRepayment(
           options.salary,
           options.repaymentThreshold,
-          options.loanBalance,
+          rowInputs.totalDebt,
           annualInterest,
-          options.rowOptions
+          options.rowOptions.incomePercentageTaxedOverThreshold
         )
       : 0;
   const totalRepaid = 0 + annualRepayment;
 
   const yearsUntilWiped = calculateYearsUntilWiped(
     options.loanPeriod,
-    options.graduatingYear
+    options.graduatingYear,
+    CURRENT_YEAR
   );
   return {
     currentLoanYear: currentLoanYear,
     graduatingYear: options.graduatingYear,
     salary: options.salary,
     calendarYear: CURRENT_YEAR,
-    totalDebt: options.loanBalance,
-    interestRate: options.rowOptions.interestRate,
+    totalDebt: rowInputs.totalDebt,
+    interestRate: options.rowOptions.planInterestRate,
     annualInterest: annualInterest,
     repaymentThreshold: options.repaymentThreshold,
     annualRepayment: annualRepayment,
@@ -137,29 +145,43 @@ export const calculateInitialYearRow = (
   };
 };
 
-export const calculateYearRow = (prevRow: YearRow, rowOptions: RowOptions) => {
-  const calendarYear = prevRow.calendarYear + 1;
-  const yearsUntilWiped = prevRow.yearsUntilWiped - 1;
+export const calculateYearRow = (
+  prevRowInputs: {
+    yearsUntilWiped: number;
+    calendarYear: number;
+    totalDebt: number;
+    annualInterest: number;
+    annualRepayment: number;
+    salary: number;
+    repaymentThreshold: number;
+    totalRepaid: number;
+  },
+  options: CalcOptions
+) => {
+  const calendarYear = prevRowInputs.calendarYear + 1;
+  const yearsUntilWiped = prevRowInputs.yearsUntilWiped - 1;
 
   const totalDebt = calculateTotalDebt(
-    prevRow.totalDebt,
-    prevRow.annualInterest,
-    prevRow.annualRepayment
+    prevRowInputs.totalDebt,
+    prevRowInputs.annualInterest,
+    prevRowInputs.annualRepayment
   );
 
   const annualInterest = calculateAnnualInterest(
     totalDebt,
-    prevRow.interestRate
+    options.rowOptions.averageInterestRate
   );
 
   const currentLoanYear =
     //TODO: get from options, remove graduatingYear from row as immutable
-    calculateCurrentLoanYear(prevRow.graduatingYear, calendarYear);
+    calculateCurrentLoanYear(options.graduatingYear, calendarYear);
 
-  const adjustedSalary = prevRow.salary * rowOptions.averageSalaryGrowth;
+  const adjustedSalary =
+    prevRowInputs.salary * options.rowOptions.averageSalaryGrowth;
 
   const repaymentThreshold =
-    prevRow.repaymentThreshold * rowOptions.repaymentThresholdGrowth;
+    prevRowInputs.repaymentThreshold *
+    options.rowOptions.repaymentThresholdGrowth;
 
   const annualRepayment =
     currentLoanYear > 0
@@ -168,27 +190,80 @@ export const calculateYearRow = (prevRow: YearRow, rowOptions: RowOptions) => {
           repaymentThreshold,
           totalDebt,
           annualInterest,
-          rowOptions
+          options.rowOptions.incomePercentageTaxedOverThreshold
         )
       : 0;
 
   return {
     currentLoanYear: currentLoanYear,
-    graduatingYear: prevRow.graduatingYear,
+    graduatingYear: options.graduatingYear,
     salary: adjustedSalary,
     calendarYear: calendarYear,
     totalDebt: totalDebt,
-    interestRate: prevRow.interestRate,
+    interestRate: options.rowOptions.averageInterestRate,
     annualInterest: annualInterest,
     repaymentThreshold: repaymentThreshold,
     annualRepayment: annualRepayment,
-    totalRepaid: prevRow.totalRepaid + annualRepayment,
+    totalRepaid: prevRowInputs.totalRepaid + annualRepayment,
     yearsUntilWiped: yearsUntilWiped,
   } as YearRow;
 };
 
-function calculateYearsUntilWiped(loanPeriod: number, graduatingYear: number) {
-  return loanPeriod - (CURRENT_YEAR - graduatingYear - 1);
+export function calculateSubsequentRows(
+  rowsToCalculateCount: number,
+  options: CalcOptions,
+  rows: YearRow[]
+) {
+  if (rows.length === 0) {
+    throw new Error("rows cannot be empty");
+  }
+  for (let i = 0; i < rowsToCalculateCount; i++) {
+    const {
+      yearsUntilWiped = rowsToCalculateCount,
+      calendarYear,
+      totalDebt,
+      annualRepayment = 0,
+      annualInterest = 0,
+      salary = calcInflation(
+        options.salary,
+        options.rowOptions.averageInterestRate,
+        CURRENT_YEAR,
+        calendarYear
+      ),
+      repaymentThreshold = calcInflation(
+        options.repaymentThreshold,
+        options.rowOptions.averageInterestRate,
+        CURRENT_YEAR,
+        calendarYear
+      ),
+      totalRepaid = 0,
+    } = rows.at(-1)!;
+
+    const newRow = calculateYearRow(
+      {
+        yearsUntilWiped,
+        calendarYear,
+        totalDebt,
+        annualRepayment,
+        annualInterest,
+        salary,
+        repaymentThreshold,
+        totalRepaid,
+      },
+      options
+    );
+    rows.push(newRow);
+    if (Math.round(newRow.totalDebt) === 0) break;
+  }
+  return rows;
+}
+
+function calculateYearsUntilWiped(
+  loanPeriod: number,
+  graduatingYear: number,
+  currentYear: number
+) {
+  return loanPeriod - (currentYear - graduatingYear - 1);
 }
 
 function calculateCurrentLoanYear(
@@ -215,18 +290,54 @@ function calculateAnnualRepayment(
   repaymentThreshold: number,
   totalDebt: number,
   annualInterest: number,
-  rowOptions: RowOptions
+  incomePercentageTaxedOverThreshold: number
 ) {
   if (salary < repaymentThreshold) {
     return 0;
   } else {
     const maxRepayment =
-      (salary - repaymentThreshold) *
-      rowOptions.incomePercentageTaxedOverThreshold;
+      (salary - repaymentThreshold) * incomePercentageTaxedOverThreshold;
 
     const annualRepayment =
       totalDebt + annualInterest - maxRepayment < 0 ? totalDebt : maxRepayment;
 
     return annualRepayment;
   }
+}
+
+export type PreGradYearRow = Partial<YearRow> &
+  Pick<
+    YearRow,
+    "calendarYear" | "totalDebt" | "interestRate" | "annualInterest"
+  >;
+
+export function calculatePreGraduationRows(
+  courseStartYear: number,
+  courseLength: number,
+  perYearLoan: number,
+  interestRate: number
+) {
+  const rows: PreGradYearRow[] = [];
+
+  for (let courseYear = 1; courseYear <= courseLength; courseYear++) {
+    const {
+      totalDebt: prevTotalDebt = 0,
+      annualInterest: prevAnnualInterest = 0,
+    } = rows.at(-1) ?? {};
+
+    const totalDebt = calculateTotalDebt(
+      prevTotalDebt + perYearLoan,
+      prevAnnualInterest,
+      0
+    );
+
+    const row: PreGradYearRow = {
+      calendarYear: courseStartYear + courseYear,
+      totalDebt,
+      interestRate,
+      annualInterest: calculateAnnualInterest(totalDebt, interestRate),
+    };
+    rows.push(row);
+  }
+  return rows;
 }
