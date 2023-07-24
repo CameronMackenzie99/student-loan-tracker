@@ -3,8 +3,9 @@ import { EditableCell } from "./EditableCell";
 import { formatCurrency } from "../utils/formatCurrency";
 import { formatTaxYear } from "../utils/formatTaxYear";
 import type { YearRow } from "./LoanProjection";
+import type { PreGradYearRow } from "@/calc/projection";
 
-const columnHelper = createColumnHelper<YearRow>();
+const columnHelper = createColumnHelper<YearRow | PreGradYearRow>();
 
 export const columns = [
   columnHelper.accessor("currentLoanYear", {
@@ -18,7 +19,6 @@ export const columns = [
   columnHelper.accessor("salary", {
     header: () => "Salary",
     cell: EditableCell,
-    // cell: (info) => formatCurrency(info.getValue()),
   }),
   columnHelper.accessor("interestRate", {
     header: () => "Interest Rate",

@@ -2,13 +2,14 @@ import { useContext, useEffect, useState } from "react";
 import type { CellContext } from "@tanstack/react-table";
 import type { YearRow } from "./LoanProjection";
 import { OptionsContext } from "../calc/defaultOptions";
+import type { PreGradYearRow } from "@/calc/projection";
 
 export const EditableCell = ({
   getValue,
   row: { index },
   column: { id },
   table,
-}: CellContext<YearRow, number>) => {
+}: CellContext<YearRow | PreGradYearRow, number>) => {
   const initialValue = getValue();
   const [value, setValue] = useState(0);
 
@@ -30,10 +31,11 @@ export const EditableCell = ({
         </div>
         <input
           type="number"
-          value={value.toFixed(0)}
+          value={value?.toFixed(0) ?? 0}
           onChange={(e) => setValue(parseInt(e.target.value))}
+          disabled={!value}
           onBlur={onBlur}
-          className="min-w-20 w-20 rounded-md border-0 pl-5 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 [appearance:textfield] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[hsl(216,92%,76%)] sm:py-1.5"
+          className="min-w-20 w-20 rounded-md border-0 pl-5 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 [appearance:textfield] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[hsl(216,92%,76%)] sm:py-1.5 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
       </div>
     </div>

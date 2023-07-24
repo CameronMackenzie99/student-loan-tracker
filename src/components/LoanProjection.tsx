@@ -4,21 +4,22 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import type { FormType } from "./LoanForm";
 import { columns } from "./columns";
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useMemo, useState } from "react";
-import type { CalcOptions } from "../calc/projection";
+import type { CalcOptions, PreGradYearRow } from "../calc/projection";
 import { calculateFullData } from "../calc/projection";
 import {
   AVERAGE_SALARY_GROWTH,
   REPAYMENT_THRESHOLD_GROWTH,
+  AVERAGE_INTEREST_RATE,
 } from "../calc/defaultRowOptions";
 import { RecalculateSubsequentRows } from "../calc/partialUpdate";
 import { OptionsContext } from "../calc/defaultOptions";
 import { LineGraph } from "./visualisations/LineGraph";
 import { calculateRealValue } from "../utils/calculateRealValue";
 import { planOptions } from "../calc/planOptions";
+import type { FormDataType } from "./MultiStepForm";
 
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -50,11 +51,17 @@ export type YearRow = {
   [R in keyof YearRowLabels]: number;
 };
 
-export const LoanProjection = (formInput: FormType) => {
+type LoanProjectionProps = {
+  formInput: FormDataType;
+};
+
+export const LoanProjection = ({ formInput }: LoanProjectionProps) => {
   const options: CalcOptions = useMemo(() => {
     return {
-      graduatingYear: formInput.graduatingYear,
-      loanBalance: formInput.loanBalance,
+      graduatingYear:
+        formInput.student === "graduate"
+          ? formInput.data!.graduatingYear
+          : formInput.data!.courseStartYear + formInput.data!.courseLength,
       loanPeriod: planOptions[formInput.plan].loanPeriod,
       repaymentThreshold: planOptions[formInput.plan].repaymentThreshold,
       salary: 30000,
@@ -62,15 +69,20 @@ export const LoanProjection = (formInput: FormType) => {
         averageSalaryGrowth: AVERAGE_SALARY_GROWTH,
         incomePercentageTaxedOverThreshold:
           planOptions[formInput.plan].incomePercentageTaxedOverThreshold,
-        interestRate: planOptions[formInput.plan].interestRate,
+        planInterestRate: planOptions[formInput.plan].interestRate,
+        averageInterestRate: AVERAGE_INTEREST_RATE,
         repaymentThresholdGrowth: REPAYMENT_THRESHOLD_GROWTH,
       },
     };
   }, [formInput]);
 
-  const tableData = useMemo(() => calculateFullData([], options), [options]);
+  const tableData = useMemo(
+    () => calculateFullData(formInput, options),
+    [formInput, options]
+  );
 
-  const [clientData, setClientData] = useState<YearRow[]>(tableData);
+  const [clientData, setClientData] =
+    useState<(YearRow | PreGradYearRow)[]>(tableData);
 
   useEffect(() => {
     setClientData(tableData);
@@ -99,7 +111,9 @@ export const LoanProjection = (formInput: FormType) => {
             return {
               calendarYear: row.calendarYear,
               salary: row.salary,
-              realSalary: calculateRealValue(row.salary, row.calendarYear),
+              realSalary: row.salary
+                ? calculateRealValue(row.salary, row.calendarYear)
+                : undefined,
             };
           })}
           independentVariable="calendarYear"
@@ -113,10 +127,9 @@ export const LoanProjection = (formInput: FormType) => {
             return {
               calendarYear: row.calendarYear,
               annualRepayment: row.annualRepayment,
-              realRepayment: calculateRealValue(
-                row.annualRepayment,
-                row.calendarYear
-              ),
+              realRepayment: row.annualRepayment
+                ? calculateRealValue(row.annualRepayment, row.calendarYear)
+                : undefined,
             };
           })}
           independentVariable="calendarYear"
@@ -134,13 +147,13 @@ const LoanTableGrid = ({
   rows,
   setRows,
 }: {
-  rows: YearRow[];
-  setRows: Dispatch<SetStateAction<YearRow[]>>;
+  rows: (YearRow | PreGradYearRow)[];
+  setRows: Dispatch<SetStateAction<(YearRow | PreGradYearRow)[]>>;
 }) => {
   const table = useReactTable({
     data: rows,
     columns,
-    getCoreRowModel: getCoreRowModel<YearRow>(),
+    getCoreRowModel: getCoreRowModel<YearRow | PreGradYearRow>(),
     meta: {
       updateData: (
         rowIndex: number,

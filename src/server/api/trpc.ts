@@ -6,7 +6,6 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
-
 /**
  * 1. CONTEXT
  *
@@ -16,7 +15,7 @@
  */
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 
-import { prisma } from "../db";
+// import { prisma } from "../db";
 
 type CreateContextOptions = Record<string, never>;
 
@@ -32,7 +31,7 @@ type CreateContextOptions = Record<string, never>;
  */
 const createInnerTRPCContext = (_opts: CreateContextOptions) => {
   return {
-    prisma,
+    // prisma,
   };
 };
 

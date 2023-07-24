@@ -1,4 +1,7 @@
-export function formatCurrency(rawAmount: number) {
+export function formatCurrency(rawAmount: number | undefined) {
+  if (rawAmount == undefined) {
+    return "";
+  }
   return rawAmount.toLocaleString("en-GB", {
     style: "currency",
     currency: "GBP",
