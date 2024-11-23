@@ -173,7 +173,6 @@ export const calculateYearRow = (
   );
 
   const currentLoanYear =
-    //TODO: get from options, remove graduatingYear from row as immutable
     calculateCurrentLoanYear(options.graduatingYear, calendarYear);
 
   const adjustedSalary =

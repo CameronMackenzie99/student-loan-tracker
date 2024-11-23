@@ -66,7 +66,7 @@ export const LoanForm = ({ onFormDataChange }: FormSetter) => {
           <input
             type="datetime"
             id="graduatingYear"
-            placeholder="2023"
+            placeholder="2024"
             className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 sm:text-sm"
             {...register("graduatingYear")}
           />

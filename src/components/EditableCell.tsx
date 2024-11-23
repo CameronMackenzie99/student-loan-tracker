@@ -32,8 +32,7 @@ export const EditableCell = ({
         <input
           type="number"
           value={value?.toFixed(0) ?? 0}
-          onChange={(e) => setValue(parseInt(e.target.value))}
-          disabled={!value}
+          onChange={(e) => e.target.value !== "" ? setValue(parseInt(e.target.value)) : setValue(0)}
           onBlur={onBlur}
           className="min-w-20 w-20 rounded-md border-0 pl-5 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 [appearance:textfield] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[hsl(216,92%,76%)] sm:py-1.5 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
