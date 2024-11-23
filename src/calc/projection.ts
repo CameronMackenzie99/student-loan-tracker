@@ -19,7 +19,7 @@ export interface CalcOptions {
   //TODO: plan - may incorporate weekly changes to threshold/interest
 }
 
-const CURRENT_YEAR = new Date().getFullYear();
+const get_current_year = () => new Date().getFullYear();
 
 export const calculateFullData = (
   formInput: FormDataType,
@@ -110,7 +110,7 @@ export const calculateInitialYearRow = (
 
   const currentLoanYear = calculateCurrentLoanYear(
     options.graduatingYear,
-    CURRENT_YEAR
+    get_current_year()
   );
 
   const annualRepayment =
@@ -128,13 +128,13 @@ export const calculateInitialYearRow = (
   const yearsUntilWiped = calculateYearsUntilWiped(
     options.loanPeriod,
     options.graduatingYear,
-    CURRENT_YEAR
+    get_current_year()
   );
   return {
     currentLoanYear: currentLoanYear,
     graduatingYear: options.graduatingYear,
     salary: options.salary,
-    calendarYear: CURRENT_YEAR,
+    calendarYear: get_current_year(),
     totalDebt: rowInputs.totalDebt,
     interestRate: options.rowOptions.planInterestRate,
     annualInterest: annualInterest,
@@ -173,7 +173,6 @@ export const calculateYearRow = (
   );
 
   const currentLoanYear =
-    //TODO: get from options, remove graduatingYear from row as immutable
     calculateCurrentLoanYear(options.graduatingYear, calendarYear);
 
   const adjustedSalary =
@@ -227,13 +226,13 @@ export function calculateSubsequentRows(
       salary = calcInflation(
         options.salary,
         options.rowOptions.averageInterestRate,
-        CURRENT_YEAR,
+        get_current_year(),
         calendarYear
       ),
       repaymentThreshold = calcInflation(
         options.repaymentThreshold,
         options.rowOptions.averageInterestRate,
-        CURRENT_YEAR,
+        get_current_year(),
         calendarYear
       ),
       totalRepaid = 0,

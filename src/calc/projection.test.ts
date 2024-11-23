@@ -1,4 +1,4 @@
-import { assert, expect, test } from "vitest";
+import { assert, expect, test, vitest } from "vitest";
 import { defaultRowOptions } from "./defaultRowOptions";
 import type { CalcOptions } from "./projection";
 import {
@@ -8,6 +8,12 @@ import {
   calculatePreGraduationRows,
 } from "./projection";
 import type { FormDataType } from "@/components/MultiStepForm";
+
+import { beforeAll } from 'vitest'
+
+beforeAll(() => {
+  vitest.setSystemTime(new Date(2023,5,10))
+})
 
 const options: CalcOptions = {
   graduatingYear: 2021,

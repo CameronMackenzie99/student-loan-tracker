@@ -236,7 +236,7 @@ function YouForm(props: SubFormProps) {
                   >
                     on the gov.uk website
                   </a>
-                  . If you are starting your course in 2023 or later, and
+                  . If you started your course in 2023 or later, and
                   studying an undergraduate degree in England you will most
                   likely be on Plan 5.
                 </FormDescription>
@@ -270,7 +270,7 @@ const CourseForm = (props: SubFormProps) => {
     resolver: zodResolver(CourseSchema),
     defaultValues: {
       courseLength: 3,
-      courseStartYear: 2023,
+      courseStartYear: 2024,
       yearlyMaintenance: 7000,
       yearlyTuition: 9250,
     },
@@ -322,7 +322,7 @@ const CourseForm = (props: SubFormProps) => {
               <FormControl>
                 <Input
                   type="number"
-                  placeholder="2023"
+                  placeholder="2024"
                   className="w-fit"
                   {...field}
                 />
