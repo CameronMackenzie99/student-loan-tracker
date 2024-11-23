@@ -11,7 +11,7 @@ import type { FormDataType } from "@/components/MultiStepForm";
 
 import { beforeAll } from 'vitest'
 
-beforeAll(async () => {
+beforeAll(() => {
   vitest.setSystemTime(new Date(2023,5,10))
 })
 
